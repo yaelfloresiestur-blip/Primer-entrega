@@ -60,9 +60,8 @@ if metodo == "Flujo Radial en Régimen Estacionario":
     if r_e <= r_w:
       st.error("El radio de drene ($r_e$) debe ser mayor que el radio del pozo ($r_w$).")
     else:
-      # Cálculo del Índice de Productividad (J*) según la ecuación del Archivo 2
-      # J* = (h * k_o) / (141.2 * B_o * mu_o * (ln(r_e / r_w) + S))
-denominador = 141.2 * B_o * mu_o * (np.log(r_e / r_w) + S)
+      # Cálculo del Índice de Productividad (J*) con la sangría correcta
+      denominador = 141.2 * B_o * mu_o * (np.log(r_e / r_w) + S)
       J_star = (h * k_o) / denominador
 
       st.success(
@@ -71,7 +70,6 @@ denominador = 141.2 * B_o * mu_o * (np.log(r_e / r_w) + S)
 
       # Generar datos para la curva IPR
       p_wf_vals = np.linspace(p_wf_min, p_e, 50)
-      # q_o = J* * (p_e - p_wf)
       q_o_vals = J_star * (p_e - p_wf_vals)
 
       df_resultado = pd.DataFrame({
@@ -119,14 +117,8 @@ elif metodo == "Método de Vogel (Aceite Saturado)":
           " yacimiento ($\\bar{p}_R$) para aplicar Vogel directamente."
       )
     else:
-      # Paso 1: Relación p_wf / p_R en la prueba
       rel_p = p_wf_test / p_R
-
-      # Paso 2: Obtener la fracción q_o / q_omax mediante la ecuación de Vogel
-      # q_o / q_omax = 1 - 0.2(p_wf/p_R) - 0.8(p_wf/p_R)^2
       frac_q = 1.0 - 0.2 * rel_p - 0.8 * (rel_p**2)
-
-      # Paso 3: Calcular el potencial del pozo q_omax (AOF)
       q_omax = q_test / frac_q
 
       st.success(
@@ -134,7 +126,6 @@ elif metodo == "Método de Vogel (Aceite Saturado)":
           f" {q_omax:.2f} STB/day"
       )
 
-      # Paso 4: Generar la curva IPR completa
       p_wf_vals = np.linspace(p_wf_min_vogel, p_R, 50)
       rel_p_vals = p_wf_vals / p_R
       q_o_vals = q_omax * (
