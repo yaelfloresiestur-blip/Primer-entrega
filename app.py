@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -9,7 +10,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# Estilos CSS personalizados para fuentes grandes y botones rojos con letras blancas
+# Estilos CSS personalizados con fuentes grandes y botones rojos
 st.markdown(
     """
     <style>
@@ -54,7 +55,7 @@ st.markdown(
         padding: 0.5rem 1rem !important;
     }
     
-    /* Efecto al pasar el cursor sobre el botón (un tono rojo un poco más oscuro) */
+    /* Efecto al pasar el cursor sobre el botón */
     .stButton > button:hover {
         background-color: #C52233 !important;
         border: 2px solid #C52233 !important;
@@ -130,12 +131,29 @@ with tab1:
 
       p_wf_vals = np.linspace(p_wf_min, p_e, 50)
       q_o_vals = J_star * (p_e - p_wf_vals)
+
+      # Gráfica con Matplotlib y nombres de ejes explícitos
+      fig, ax = plt.subplots(figsize=(8, 5))
+      ax.plot(
+          q_o_vals,
+          p_wf_vals,
+          color="#E63946",
+          linewidth=2.5,
+          label="Curva IPR Estacionario",
+      )
+      ax.set_xlabel("Gasto de Aceite, $q_o$ (STB/d)", fontsize=14)
+      ax.set_ylabel("Presión de Fondo Fluyente, $p_{wf}$ (psia)", fontsize=14)
+      ax.set_title(
+          "Comportamiento de Afluencia - Flujo Estacionario", fontsize=15
+      )
+      ax.grid(True, linestyle="--", alpha=0.6)
+      ax.legend(fontsize=12)
+      st.pyplot(fig)
+
       df_resultado = pd.DataFrame({
           "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
           "Gasto de Aceite, q_o (STB/d)": q_o_vals,
       })
-      st.subheader("Resultados de la Curva IPR")
-      st.line_chart(df_resultado.set_index("Presión de Fondo Fluyente, p_wf (psia)"))
       with st.expander("Ver tabla de datos detallada"):
         st.dataframe(df_resultado)
 
@@ -185,12 +203,27 @@ with tab2:
       q_o_vals = q_omax * (
           1.0 - (0.2 * rel_p_vals) - (0.8 * (rel_p_vals**2))
       )
+
+      # Gráfica con Matplotlib y nombres de ejes explícitos
+      fig, ax = plt.subplots(figsize=(8, 5))
+      ax.plot(
+          q_o_vals,
+          p_wf_vals,
+          color="#2A9D8F",
+          linewidth=2.5,
+          label="Curva IPR Vogel",
+      )
+      ax.set_xlabel("Gasto de Aceite, $q_o$ (STB/d)", fontsize=14)
+      ax.set_ylabel("Presión de Fondo Fluyente, $p_{wf}$ (psia)", fontsize=14)
+      ax.set_title("Curva IPR - Método de Vogel", fontsize=15)
+      ax.grid(True, linestyle="--", alpha=0.6)
+      ax.legend(fontsize=12)
+      st.pyplot(fig)
+
       df_vogel = pd.DataFrame({
           "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
           "Gasto de Aceite, q_o (STB/d)": q_o_vals,
       })
-      st.subheader("Curva IPR - Vogel")
-      st.line_chart(df_vogel.set_index("Presión de Fondo Fluyente, p_wf (psia)"))
       with st.expander("Ver tabla de datos detallada"):
         st.dataframe(df_vogel)
 
@@ -264,12 +297,26 @@ with tab3:
         )
         q_o_vals = np.maximum(q_o_vals, 0)
 
+        # Gráfica con Matplotlib y nombres de ejes explícitos
+        fig, ax = plt.subplots(figsize=(8, 5))
+        ax.plot(
+            q_o_vals,
+            p_wf_vals,
+            color="#E76F51",
+            linewidth=2.5,
+            label=f"Curva IPR Standing (EF={ef})",
+        )
+        ax.set_xlabel("Gasto de Aceite, $q_o$ (bpd)", fontsize=14)
+        ax.set_ylabel("Presión de Fondo Fluyente, $p_{wf}$ (psia)", fontsize=14)
+        ax.set_title("Curva IPR - Método de Standing", fontsize=15)
+        ax.grid(True, linestyle="--", alpha=0.6)
+        ax.legend(fontsize=12)
+        st.pyplot(fig)
+
         df_std = pd.DataFrame({
             "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
             f"Gasto de Aceite, q_o (bpd) [EF={ef}]": q_o_vals,
         })
-        st.subheader("Curva IPR - Método de Standing")
-        st.line_chart(df_std.set_index("Presión de Fondo Fluyente, p_wf (psia)"))
         with st.expander("Ver tabla de datos detallada"):
           st.dataframe(df_std)
 
@@ -375,10 +422,26 @@ with tab4:
         pwf_curve = p_R_jbg - ((a * (q_curve**2)) + (b * q_curve))
         pwf_curve = np.maximum(pwf_curve, 0)
 
+        # Gráfica con Matplotlib y nombres de ejes explícitos
+        fig, ax = plt.subplots(figsize=(8, 5))
+        ax.plot(
+            q_curve,
+            pwf_curve,
+            color="#264653",
+            linewidth=2.5,
+            label="Curva IPR JBG",
+        )
+        ax.set_xlabel("Gasto de Aceite, $q_o$ (bpd)", fontsize=14)
+        ax.set_ylabel("Presión de Fondo Fluyente, $p_{wf}$ (psia)", fontsize=14)
+        ax.set_title(
+            "Curva IPR - Método de Jones, Blount y Glaze (JBG)", fontsize=15
+        )
+        ax.grid(True, linestyle="--", alpha=0.6)
+        ax.legend(fontsize=12)
+        st.pyplot(fig)
+
         df_jbg = pd.DataFrame(
             {"Gasto de Aceite, q_o (bpd)": q_curve, "Presión p_wf (psia)": pwf_curve}
         )
-        st.subheader("Curva IPR - Método JBG")
-        st.line_chart(df_jbg.set_index("Gasto de Aceite, q_o (bpd)"))
         with st.expander("Ver tabla de datos detallada"):
           st.dataframe(df_jbg)
