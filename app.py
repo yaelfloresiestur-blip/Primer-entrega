@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -132,28 +131,13 @@ with tab1:
       p_wf_vals = np.linspace(p_wf_min, p_e, 50)
       q_o_vals = J_star * (p_e - p_wf_vals)
 
-      # Gráfica con Matplotlib y nombres de ejes explícitos
-      fig, ax = plt.subplots(figsize=(8, 5))
-      ax.plot(
-          q_o_vals,
-          p_wf_vals,
-          color="#E63946",
-          linewidth=2.5,
-          label="Curva IPR Estacionario",
-      )
-      ax.set_xlabel("Gasto de Aceite, $q_o$ (STB/d)", fontsize=14)
-      ax.set_ylabel("Presión de Fondo Fluyente, $p_{wf}$ (psia)", fontsize=14)
-      ax.set_title(
-          "Comportamiento de Afluencia - Flujo Estacionario", fontsize=15
-      )
-      ax.grid(True, linestyle="--", alpha=0.6)
-      ax.legend(fontsize=12)
-      st.pyplot(fig)
-
       df_resultado = pd.DataFrame({
-          "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
           "Gasto de Aceite, q_o (STB/d)": q_o_vals,
+          "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
       })
+      st.subheader("Curva IPR (Eje X: Gasto de Aceite | Eje Y: Presión)")
+      st.line_chart(df_resultado.set_index("Gasto de Aceite, q_o (STB/d)"))
+
       with st.expander("Ver tabla de datos detallada"):
         st.dataframe(df_resultado)
 
@@ -204,26 +188,15 @@ with tab2:
           1.0 - (0.2 * rel_p_vals) - (0.8 * (rel_p_vals**2))
       )
 
-      # Gráfica con Matplotlib y nombres de ejes explícitos
-      fig, ax = plt.subplots(figsize=(8, 5))
-      ax.plot(
-          q_o_vals,
-          p_wf_vals,
-          color="#2A9D8F",
-          linewidth=2.5,
-          label="Curva IPR Vogel",
-      )
-      ax.set_xlabel("Gasto de Aceite, $q_o$ (STB/d)", fontsize=14)
-      ax.set_ylabel("Presión de Fondo Fluyente, $p_{wf}$ (psia)", fontsize=14)
-      ax.set_title("Curva IPR - Método de Vogel", fontsize=15)
-      ax.grid(True, linestyle="--", alpha=0.6)
-      ax.legend(fontsize=12)
-      st.pyplot(fig)
-
       df_vogel = pd.DataFrame({
-          "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
           "Gasto de Aceite, q_o (STB/d)": q_o_vals,
+          "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
       })
+      st.subheader(
+          "Curva IPR - Vogel (Eje X: Gasto de Aceite | Eje Y: Presión)"
+      )
+      st.line_chart(df_vogel.set_index("Gasto de Aceite, q_o (STB/d)"))
+
       with st.expander("Ver tabla de datos detallada"):
         st.dataframe(df_vogel)
 
@@ -297,26 +270,15 @@ with tab3:
         )
         q_o_vals = np.maximum(q_o_vals, 0)
 
-        # Gráfica con Matplotlib y nombres de ejes explícitos
-        fig, ax = plt.subplots(figsize=(8, 5))
-        ax.plot(
-            q_o_vals,
-            p_wf_vals,
-            color="#E76F51",
-            linewidth=2.5,
-            label=f"Curva IPR Standing (EF={ef})",
-        )
-        ax.set_xlabel("Gasto de Aceite, $q_o$ (bpd)", fontsize=14)
-        ax.set_ylabel("Presión de Fondo Fluyente, $p_{wf}$ (psia)", fontsize=14)
-        ax.set_title("Curva IPR - Método de Standing", fontsize=15)
-        ax.grid(True, linestyle="--", alpha=0.6)
-        ax.legend(fontsize=12)
-        st.pyplot(fig)
-
         df_std = pd.DataFrame({
-            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
             f"Gasto de Aceite, q_o (bpd) [EF={ef}]": q_o_vals,
+            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
         })
+        st.subheader(
+            "Curva IPR - Standing (Eje X: Gasto de Aceite | Eje Y: Presión)"
+        )
+        st.line_chart(df_std.set_index(f"Gasto de Aceite, q_o (bpd) [EF={ef}]"))
+
         with st.expander("Ver tabla de datos detallada"):
           st.dataframe(df_std)
 
@@ -329,119 +291,3 @@ with tab4:
   )
 
   p_R_jbg = st.number_input(
-      "Presión media del yacimiento, p_R (psia)", value=4500.0, key="pr4"
-  )
-  st.markdown(
-      "Ingrese los datos de la prueba de producción (multi-gasto /"
-      " flow-after-flow):"
-  )
-
-  df_default = pd.DataFrame({
-      "Gasto, q_o (bpd)": [550.0, 670.0, 750.0, 820.0],
-      "Presión p_wf (psia)": [4474.0, 4465.0, 4459.0, 4452.0],
-  })
-  edited_df = st.data_editor(df_default, num_rows="dynamic", key="editor4")
-
-  if st.button("Calcular JBG y Diagnóstico", key="btn4"):
-    if len(edited_df) < 2:
-      st.error(
-          "Se requieren al menos 2 puntos de prueba para aplicar el método"
-          " JBG."
-      )
-    else:
-      q_arr = edited_df["Gasto, q_o (bpd)"].values.astype(float)
-      pwf_arr = edited_df["Presión p_wf (psia)"].values.astype(float)
-
-      if np.any(q_arr <= 0):
-        st.error("Los gastos deben ser mayores a cero.")
-      else:
-        y_vals = (p_R_jbg - pwf_arr) / q_arr
-        a, b = np.polyfit(q_arr, y_vals, 1)
-
-        if a <= 0:
-          q_max = p_R_jbg / b if b > 0 else 0
-        else:
-          discriminant = (b**2) + (4 * a * p_R_jbg)
-          q_max = (-b + np.sqrt(discriminant)) / (2 * a)
-
-        b_prime = b + (a * q_max)
-        ratio_bb = b_prime / b if b != 0 else 0
-
-        st.success(
-            f"**Coeficiente de Turbulencia (a):** {a:.6f} (psi/bpd²)\n\n"
-            f"**Indicador de Daño (b):** {b:.4f} (psi/bpd)\n\n"
-            f"**Gasto Máximo / Potencial (q_max):** {q_max:.2f} bpd\n\n"
-            f"**Parámetro b':** {b_prime:.4f} | **Relación b'/b:**"
-            f" {ratio_bb:.2f}"
-        )
-
-        st.subheader("📋 Diagnóstico de la Terminación (Criterios JBG)")
-        diag_msg = []
-        if b <= 0.05:
-          diag_msg.append(
-              "✅ **Daño:** El pozo **no presenta daño** a la formación ($b"
-              " \\le 0.05$)."
-          )
-        else:
-          diag_msg.append(
-              "⚠️ **Daño:** El pozo **presenta daño** a la formación ($b >"
-              " 0.05$)."
-          )
-
-        if ratio_bb <= 2:
-          diag_msg.append(
-              "✅ **Turbulencia:** La turbulencia es baja o despreciable"
-              " ($b'/b \\le 2$)."
-          )
-        else:
-          diag_msg.append(
-              "⚠️ **Turbulencia:** Existe un efecto importante de flujo"
-              " turbulento/no darciano ($b'/b > 2$)."
-          )
-
-        if b <= 0.05 and ratio_bb <= 2:
-          diag_msg.append(
-              "🌟 **Recomendación:** La terminación del pozo es **muy buena**."
-          )
-        elif b <= 0.05 and ratio_bb > 2:
-          diag_msg.append(
-              "💡 **Recomendación:** No se recomienda estimular. La baja"
-              " productividad se debe a área insuficiente del intervalo"
-              " disparado. Se sugiere **incrementar el área disparada**."
-          )
-        elif b > 0.05 and ratio_bb <= 2:
-          diag_msg.append(
-              "💡 **Recomendación:** Se recomienda realizar un trabajo de"
-              " **estimulación**."
-          )
-
-        for msg in diag_msg:
-          st.markdown(msg)
-
-        q_curve = np.linspace(0, q_max, 50)
-        pwf_curve = p_R_jbg - ((a * (q_curve**2)) + (b * q_curve))
-        pwf_curve = np.maximum(pwf_curve, 0)
-
-        # Gráfica con Matplotlib y nombres de ejes explícitos
-        fig, ax = plt.subplots(figsize=(8, 5))
-        ax.plot(
-            q_curve,
-            pwf_curve,
-            color="#264653",
-            linewidth=2.5,
-            label="Curva IPR JBG",
-        )
-        ax.set_xlabel("Gasto de Aceite, $q_o$ (bpd)", fontsize=14)
-        ax.set_ylabel("Presión de Fondo Fluyente, $p_{wf}$ (psia)", fontsize=14)
-        ax.set_title(
-            "Curva IPR - Método de Jones, Blount y Glaze (JBG)", fontsize=15
-        )
-        ax.grid(True, linestyle="--", alpha=0.6)
-        ax.legend(fontsize=12)
-        st.pyplot(fig)
-
-        df_jbg = pd.DataFrame(
-            {"Gasto de Aceite, q_o (bpd)": q_curve, "Presión p_wf (psia)": pwf_curve}
-        )
-        with st.expander("Ver tabla de datos detallada"):
-          st.dataframe(df_jbg)
