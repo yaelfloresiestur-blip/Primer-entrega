@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# Estilos CSS personalizados con fuentes grandes
+# Estilos CSS personalizados para fuentes grandes y botones rojos con letras blancas
 st.markdown(
     """
     <style>
@@ -41,6 +41,24 @@ st.markdown(
     /* Párrafos, etiquetas y textos descriptivos */
     p, label, .stMarkdown, .stNumberInput label {
         font-size: 1.25rem !important;
+    }
+    
+    /* Personalización de los botones principales (Fondo rojo, borde rojo y texto blanco) */
+    .stButton > button {
+        background-color: #E63946 !important;
+        color: white !important;
+        border: 2px solid #E63946 !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 1.2rem !important;
+        padding: 0.5rem 1rem !important;
+    }
+    
+    /* Efecto al pasar el cursor sobre el botón (un tono rojo un poco más oscuro) */
+    .stButton > button:hover {
+        background-color: #C52233 !important;
+        border: 2px solid #C52233 !important;
+        color: white !important;
     }
     </style>
     """,
