@@ -233,7 +233,8 @@ with tab4:
       "Gasto, q_o (bpd)": [550.0, 670.0, 750.0, 820.0],
       "Presión p_wf (psia)": [4474.0, 4465.0, 4459.0, 4452.0],
   })
-  edited_df = st.data_editor(df_default, num_rows_dynamic=True, key="editor4")
+  # Corregido con num_rows="dynamic"
+  edited_df = st.data_editor(df_default, num_rows="dynamic", key="editor4")
 
   if st.button("Calcular JBG y Diagnóstico"):
     if len(edited_df) < 2:
@@ -301,8 +302,7 @@ with tab4:
           diag_msg.append(
               "💡 **Recomendación:** No se recomienda estimular. La baja"
               " productividad se debe a área insuficiente del intervalo"
-              " disparado. Se sugiere **incrementar el área disparada** [cite:"
-              " 104]."
+              " disparado. Se sugiere **incrementar el área disparada**[cite: 104]."
           )
         elif b > 0.05 and ratio_bb <= 2:
           diag_msg.append(
