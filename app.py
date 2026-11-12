@@ -271,23 +271,4 @@ with tab3:
         q_o_vals = np.maximum(q_o_vals, 0)
 
         df_std = pd.DataFrame({
-            f"Gasto de Aceite, q_o (bpd) [EF={ef}]": q_o_vals,
-            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
-        })
-        st.subheader(
-            "Curva IPR - Standing (Eje X: Gasto de Aceite | Eje Y: Presión)"
-        )
-        st.line_chart(df_std.set_index(f"Gasto de Aceite, q_o (bpd) [EF={ef}]"))
-
-        with st.expander("Ver tabla de datos detallada"):
-          st.dataframe(df_std)
-
-with tab4:
-  st.header("⚡ Método de Jones, Blount y Glaze (JBG - Turbulencia y Daño)")
-  st.markdown(
-      "Permite diferenciar las caídas de presión por flujo turbulento (no"
-      " darciano) y por daño a la formación mediante una prueba de"
-      " multi-gasto."
-  )
-
-  p_R_jbg = st.number_input(
+            f"Gasto de Aceite, q_o (bpd) [EF={ef}]": q_
