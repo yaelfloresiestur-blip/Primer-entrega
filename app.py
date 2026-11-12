@@ -9,6 +9,44 @@ st.set_page_config(
     layout="wide",
 )
 
+# Estilos CSS personalizados para hacer las letras y elementos más grandes y legibles
+st.markdown(
+    """
+    <style>
+    /* Tamaño general del texto en la aplicación */
+    html, body, [class*="css"] {
+        font-size: 18px;
+    }
+    
+    /* Títulos principales grandes */
+    h1 {
+        font-size: 2.5rem !important;
+        font-weight: 700 !important;
+        color: #FF4B4B;
+    }
+    
+    /* Subtítulos y encabezados de sección */
+    h2, h3 {
+        font-size: 1.8rem !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Texto de las pestañas (tabs) más grande y visible */
+    .stTabs [data-baseweb="tab"] {
+        font-size: 20px !important;
+        font-weight: 600 !important;
+        padding: 10px 20px !important;
+    }
+    
+    /* Etiquetas de los inputs y textos descriptivos */
+    p, label, .stMarkdown {
+        font-size: 1.1rem !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.title("🛢️ Herramienta Avanzada de Comportamiento de Afluencia (IPR)")
 st.markdown(
     """
@@ -60,7 +98,7 @@ with tab1:
         key="pwfmin1",
     )
 
-  if st.button("Calcular IPR - Flujo Estacionario"):
+  if st.button("Calcular IPR - Flujo Estacionario", key="btn1"):
     if r_e <= r_w:
       st.error("El radio de drene ($r_e$) debe ser mayor que el radio del pozo ($r_w$).")
     else:
@@ -106,7 +144,7 @@ with tab2:
         key="pwfmin2",
     )
 
-  if st.button("Calcular Curva IPR de Vogel"):
+  if st.button("Calcular Curva IPR de Vogel", key="btn2"):
     if p_wf_test >= p_R:
       st.error(
           "La presión de prueba ($p_{wf}$) debe ser menor que la presión del"
@@ -171,7 +209,7 @@ with tab3:
         key="p_wf_min_std",
     )
 
-  if st.button("Calcular IPR - Standing"):
+  if st.button("Calcular IPR - Standing", key="btn3"):
     if p_wf_std >= p_R_std:
       st.error(
           "La presión de prueba ($p_{wf}$) debe ser menor que la presión del"
@@ -233,10 +271,9 @@ with tab4:
       "Gasto, q_o (bpd)": [550.0, 670.0, 750.0, 820.0],
       "Presión p_wf (psia)": [4474.0, 4465.0, 4459.0, 4452.0],
   })
-  # Corregido con num_rows="dynamic"
   edited_df = st.data_editor(df_default, num_rows="dynamic", key="editor4")
 
-  if st.button("Calcular JBG y Diagnóstico"):
+  if st.button("Calcular JBG y Diagnóstico", key="btn4"):
     if len(edited_df) < 2:
       st.error(
           "Se requieren al menos 2 puntos de prueba para aplicar el método"
