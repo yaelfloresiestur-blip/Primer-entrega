@@ -53,6 +53,10 @@ st.markdown(
 Esta aplicación calcula y genera las curvas de afluencia (IPR) para pozos petroleros 
 utilizando los métodos de **Flujo Radial Estacionario**, **Vogel**, **Standing (con Eficiencia de Flujo / Daño)** 
 y **Jones, Blount y Glaze (JBG - Turbulencia y Daño)**, manteniendo todos los apartados visibles al mismo tiempo.
+
+**Creadores:**  
+* Flores Carrillo Yael  
+* Salas Navarro Agueda Jaqueline
 """
 )
 
@@ -176,7 +180,7 @@ with tab3:
   st.header("📊 Método de Standing (Considerando Daño y Eficiencia de Flujo)")
   st.markdown(
       "Extensión de Vogel que incorpora la **Eficiencia de Flujo (EF / FE)**"
-      " para pozos dañados ($EF < 1$) o estimulados ($EF > 1$)[cite: 92, 93]."
+      " para pozos dañados ($EF < 1$) o estimulados ($EF > 1$)."
   )
 
   col1, col2 = st.columns(2)
@@ -256,7 +260,7 @@ with tab4:
   st.markdown(
       "Permite diferenciar las caídas de presión por flujo turbulento (no"
       " darciano) y por daño a la formación mediante una prueba de"
-      " multi-gasto[cite: 102, 103, 104]."
+      " multi-gasto."
   )
 
   p_R_jbg = st.number_input(
@@ -264,7 +268,7 @@ with tab4:
   )
   st.markdown(
       "Ingrese los datos de la prueba de producción (multi-gasto /"
-      " flow-after-flow)[cite: 104]:"
+      " flow-after-flow):"
   )
 
   df_default = pd.DataFrame({
@@ -311,39 +315,39 @@ with tab4:
         if b <= 0.05:
           diag_msg.append(
               "✅ **Daño:** El pozo **no presenta daño** a la formación ($b"
-              " \\le 0.05$)[cite: 104]."
+              " \\le 0.05$)."
           )
         else:
           diag_msg.append(
               "⚠️ **Daño:** El pozo **presenta daño** a la formación ($b >"
-              " 0.05$)[cite: 104]."
+              " 0.05$)."
           )
 
         if ratio_bb <= 2:
           diag_msg.append(
               "✅ **Turbulencia:** La turbulencia es baja o despreciable"
-              " ($b'/b \\le 2$)[cite: 104]."
+              " ($b'/b \\le 2$)."
           )
         else:
           diag_msg.append(
               "⚠️ **Turbulencia:** Existe un efecto importante de flujo"
-              " turbulento/no darciano ($b'/b > 2$)[cite: 104]."
+              " turbulento/no darciano ($b'/b > 2$)."
           )
 
         if b <= 0.05 and ratio_bb <= 2:
           diag_msg.append(
-              "🌟 **Recomendación:** La terminación del pozo es **muy buena**[cite: 104]."
+              "🌟 **Recomendación:** La terminación del pozo es **muy buena**."
           )
         elif b <= 0.05 and ratio_bb > 2:
           diag_msg.append(
               "💡 **Recomendación:** No se recomienda estimular. La baja"
               " productividad se debe a área insuficiente del intervalo"
-              " disparado. Se sugiere **incrementar el área disparada**[cite: 104]."
+              " disparado. Se sugiere **incrementar el área disparada**."
           )
         elif b > 0.05 and ratio_bb <= 2:
           diag_msg.append(
               "💡 **Recomendación:** Se recomienda realizar un trabajo de"
-              " **estimulación**[cite: 104]."
+              " **estimulación**."
           )
 
         for msg in diag_msg:
