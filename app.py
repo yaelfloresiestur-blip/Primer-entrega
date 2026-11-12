@@ -14,22 +14,19 @@ st.markdown(
     """
 Esta aplicación calcula y genera las curvas de afluencia (IPR) para pozos petroleros 
 utilizando los métodos de **Flujo Radial Estacionario**, **Vogel**, **Standing (con Eficiencia de Flujo / Daño)** 
-y **Jones, Blount y Glaze (JBG - Turbulencia y Daño)**, basado en los documentos académicos de ingeniería de yacimientos.
+y **Jones, Blount y Glaze (JBG - Turbulencia y Daño)**, manteniendo todos los apartados visibles al mismo tiempo.
 """
 )
 
-# Menú lateral para seleccionar el método
-metodo = st.sidebar.selectbox(
-    "Seleccione el Método de Cálculo",
-    [
-        "Flujo Radial en Régimen Estacionario",
-        "Método de Vogel (Aceite Saturado)",
-        "Método de Standing (Eficiencia de Flujo / Daño)",
-        "Método de Jones, Blount y Glaze (JBG)",
-    ],
-)
+# Creación de pestañas para mostrar todos los métodos sin menús desplegables
+tab1, tab2, tab3, tab4 = st.tabs([
+    "1. Flujo Estacionario",
+    "2. Método de Vogel",
+    "3. Método de Standing",
+    "4. Método JBG",
+])
 
-if metodo == "Flujo Radial en Régimen Estacionario":
+with tab1:
   st.header("📈 Flujo Radial en Régimen Estacionario (Yacimientos de Aceite)")
   st.markdown(
       "Calcula el gasto de aceite y el índice de productividad ($J^*$) bajo"
@@ -38,21 +35,29 @@ if metodo == "Flujo Radial en Régimen Estacionario":
 
   col1, col2 = st.columns(2)
   with col1:
-    h = st.number_input("Espesor del yacimiento, h (ft)", value=53.0)
+    h = st.number_input("Espesor del yacimiento, h (ft)", value=53.0, key="h1")
     k_o = st.number_input(
-        "Permeabilidad efectiva al aceite, $k_o$ (md)", value=8.2
+        "Permeabilidad efectiva al aceite, $k_o$ (md)", value=8.2, key="ko1"
     )
-    p_e = st.number_input("Presión del yacimiento, $p_e$ (psia)", value=5651.0)
-    mu_o = st.number_input("Viscosidad del aceite, $\\mu_o$ (cp)", value=1.7)
+    p_e = st.number_input(
+        "Presión del yacimiento, $p_e$ (psia)", value=5651.0, key="pe1"
+    )
+    mu_o = st.number_input(
+        "Viscosidad del aceite, $\\mu_o$ (cp)", value=1.7, key="mu1"
+    )
     B_o = st.number_input(
-        "Factor de volumen del aceite, $B_o$ (bbl/STB)", value=1.1
+        "Factor de volumen del aceite, $B_o$ (bbl/STB)", value=1.1, key="bo1"
     )
   with col2:
-    r_e = st.number_input("Radio de drene, $r_e$ (ft)", value=2980.0)
-    r_w = st.number_input("Radio del pozo, $r_w$ (ft)", value=0.328)
-    S = st.number_input("Factor de daño, $S$", value=0.0)
+    r_e = st.number_input(
+        "Radio de drene, $r_e$ (ft)", value=2980.0, key="re1"
+    )
+    r_w = st.number_input("Radio del pozo, $r_w$ (ft)", value=0.328, key="rw1")
+    S = st.number_input("Factor de daño, $S$", value=0.0, key="s1")
     p_wf_min = st.number_input(
-        "Presión mínima de fondo fluyente evaluada, $p_{wf}$ (psia)", value=0.0
+        "Presión mínima de fondo fluyente evaluada, $p_{wf}$ (psia)",
+        value=0.0,
+        key="pwfmin1",
     )
 
   if st.button("Calcular IPR - Flujo Estacionario"):
@@ -74,7 +79,7 @@ if metodo == "Flujo Radial en Régimen Estacionario":
       with st.expander("Ver tabla de datos detallada"):
         st.dataframe(df_resultado)
 
-elif metodo == "Método de Vogel (Aceite Saturado)":
+with tab2:
   st.header("📉 Método de Vogel (Yacimientos de Aceite Saturado)")
   st.markdown(
       "Calcula el comportamiento de afluencia no lineal para yacimientos"
@@ -84,17 +89,21 @@ elif metodo == "Método de Vogel (Aceite Saturado)":
   col1, col2 = st.columns(2)
   with col1:
     p_R = st.number_input(
-        "Presión media del yacimiento, p_R (psia)", value=2500.0
+        "Presión media del yacimiento, p_R (psia)", value=2500.0, key="pr2"
     )
     p_wf_test = st.number_input(
-        "Presión de fondo fluyendo de prueba, p_wf (psia)", value=2000.0
+        "Presión de fondo fluyendo de prueba, p_wf (psia)",
+        value=2000.0,
+        key="pwftest2",
     )
     q_test = st.number_input(
-        "Gasto medido a p_wf de prueba, q_o (STB/d)", value=650.0
+        "Gasto medido a p_wf de prueba, q_o (STB/d)", value=650.0, key="qtest2"
     )
   with col2:
     p_wf_min_vogel = st.number_input(
-        "Presión mínima para la curva, p_wf (psia)", value=0.0
+        "Presión mínima para la curva, p_wf (psia)",
+        value=0.0,
+        key="pwfmin2",
     )
 
   if st.button("Calcular Curva IPR de Vogel"):
@@ -125,7 +134,7 @@ elif metodo == "Método de Vogel (Aceite Saturado)":
       with st.expander("Ver tabla de datos detallada"):
         st.dataframe(df_vogel)
 
-elif metodo == "Método de Standing (Eficiencia de Flujo / Daño)":
+with tab3:
   st.header("📊 Método de Standing (Considerando Daño y Eficiencia de Flujo)")
   st.markdown(
       "Extensión de Vogel que incorpora la **Eficiencia de Flujo (EF / FE)**"
@@ -154,6 +163,7 @@ elif metodo == "Método de Standing (Eficiencia de Flujo / Daño)":
         min_value=0.1,
         max_value=3.0,
         step=0.1,
+        key="ef3",
     )
     p_wf_min_std = st.number_input(
         "Presión mínima para la curva, p_wf (psia)",
@@ -203,7 +213,7 @@ elif metodo == "Método de Standing (Eficiencia de Flujo / Daño)":
         with st.expander("Ver tabla de datos detallada"):
           st.dataframe(df_std)
 
-elif metodo == "Método de Jones, Blount y Glaze (JBG)":
+with tab4:
   st.header("⚡ Método de Jones, Blount y Glaze (JBG - Turbulencia y Daño)")
   st.markdown(
       "Permite diferenciar las caídas de presión por flujo turbulento (no"
@@ -212,7 +222,7 @@ elif metodo == "Método de Jones, Blount y Glaze (JBG)":
   )
 
   p_R_jbg = st.number_input(
-      "Presión media del yacimiento, p_R (psia)", value=4500.0
+      "Presión media del yacimiento, p_R (psia)", value=4500.0, key="pr4"
   )
   st.markdown(
       "Ingrese los datos de la prueba de producción (multi-gasto /"
@@ -223,7 +233,7 @@ elif metodo == "Método de Jones, Blount y Glaze (JBG)":
       "Gasto, q_o (bpd)": [550.0, 670.0, 750.0, 820.0],
       "Presión p_wf (psia)": [4474.0, 4465.0, 4459.0, 4452.0],
   })
-  edited_df = st.data_editor(df_default, num_rows_dynamic=True)
+  edited_df = st.data_editor(df_default, num_rows_dynamic=True, key="editor4")
 
   if st.button("Calcular JBG y Diagnóstico"):
     if len(edited_df) < 2:
@@ -239,7 +249,6 @@ elif metodo == "Método de Jones, Blount y Glaze (JBG)":
         st.error("Los gastos deben ser mayores a cero.")
       else:
         y_vals = (p_R_jbg - pwf_arr) / q_arr
-        # Regresión lineal y = a*q + b (pendiente a, intercepto b)
         a, b = np.polyfit(q_arr, y_vals, 1)
 
         if a <= 0:
@@ -259,7 +268,6 @@ elif metodo == "Método de Jones, Blount y Glaze (JBG)":
             f" {ratio_bb:.2f}"
         )
 
-        # Diagnóstico técnico basado en el documento fuente
         st.subheader("📋 Diagnóstico de la Terminación (Criterios JBG)")
         diag_msg = []
         if b <= 0.05:
@@ -305,7 +313,6 @@ elif metodo == "Método de Jones, Blount y Glaze (JBG)":
         for msg in diag_msg:
           st.markdown(msg)
 
-        # Curva IPR JBG: p_wf = p_R - (a*q^2 + b*q)
         q_curve = np.linspace(0, q_max, 50)
         pwf_curve = p_R_jbg - ((a * (q_curve**2)) + (b * q_curve))
         pwf_curve = np.maximum(pwf_curve, 0)
