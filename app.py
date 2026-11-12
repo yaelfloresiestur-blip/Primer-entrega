@@ -1,3 +1,4 @@
+import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -135,8 +136,24 @@ with tab1:
           "Gasto de Aceite, q_o (STB/d)": q_o_vals,
           "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
       })
-      st.subheader("Curva IPR (Eje X: Gasto de Aceite | Eje Y: Presión)")
-      st.line_chart(df_resultado.set_index("Gasto de Aceite, q_o (STB/d)"))
+
+      st.subheader("Curva IPR - Flujo Estacionario")
+      chart = (
+          alt.Chart(df_resultado)
+          .mark_line(color="#E63946", strokeWidth=3)
+          .encode(
+              x=alt.X(
+                  "Gasto de Aceite, q_o (STB/d):Q",
+                  title="Gasto de Aceite, q_o (STB/d)",
+              ),
+              y=alt.Y(
+                  "Presión de Fondo Fluyente, p_wf (psia):Q",
+                  title="Presión de Fondo Fluyente, p_wf (psia)",
+              ),
+          )
+          .properties(height=400)
+      )
+      st.altair_chart(chart, use_container_width=True)
 
       with st.expander("Ver tabla de datos detallada"):
         st.dataframe(df_resultado)
@@ -192,10 +209,24 @@ with tab2:
           "Gasto de Aceite, q_o (STB/d)": q_o_vals,
           "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
       })
-      st.subheader(
-          "Curva IPR - Vogel (Eje X: Gasto de Aceite | Eje Y: Presión)"
+
+      st.subheader("Curva IPR - Método de Vogel")
+      chart = (
+          alt.Chart(df_vogel)
+          .mark_line(color="#2A9D8F", strokeWidth=3)
+          .encode(
+              x=alt.X(
+                  "Gasto de Aceite, q_o (STB/d):Q",
+                  title="Gasto de Aceite, q_o (STB/d)",
+              ),
+              y=alt.Y(
+                  "Presión de Fondo Fluyente, p_wf (psia):Q",
+                  title="Presión de Fondo Fluyente, p_wf (psia)",
+              ),
+          )
+          .properties(height=400)
       )
-      st.line_chart(df_vogel.set_index("Gasto de Aceite, q_o (STB/d)"))
+      st.altair_chart(chart, use_container_width=True)
 
       with st.expander("Ver tabla de datos detallada"):
         st.dataframe(df_vogel)
@@ -275,3 +306,43 @@ with tab3:
             col_name: q_o_vals,
             "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
         })
+
+        st.subheader("Curva IPR - Método de Standing")
+        chart = (
+            alt.Chart(df_std)
+            .mark_line(color="#E76F51", strokeWidth=3)
+            .encode(
+                x=alt.X(f"{col_name}:Q", title=col_name),
+                y=alt.Y(
+                    "Presión de Fondo Fluyente, p_wf (psia):Q",
+                    title="Presión de Fondo Fluyente, p_wf (psia)",
+                ),
+            )
+            .properties(height=400)
+        )
+        st.altair_chart(chart, use_container_width=True)
+
+        with st.expander("Ver tabla de datos detallada"):
+          st.dataframe(df_std)
+
+with tab4:
+  st.header("⚡ Método de Jones, Blount y Glaze (JBG - Turbulencia y Daño)")
+  st.markdown(
+      "Permite diferenciar las caídas de presión por flujo turbulento (no"
+      " darciano) y por daño a la formación mediante una prueba de"
+      " multi-gasto."
+  )
+
+  p_R_jbg = st.number_input(
+      "Presión media del yacimiento, p_R (psia)", value=4500.0, key="pr4"
+  )
+  st.markdown(
+      "Ingrese los datos de la prueba de producción (multi-gasto /"
+      " flow-after-flow):"
+  )
+
+  df_default = pd.DataFrame({
+      "Gasto, q_o (bpd)": [550.0, 670.0, 750.0, 820.0],
+      "Presión p_wf (psia)": [4474.0, 4465.0, 4459.0, 4452.0],
+  })
+  edited_df = st.data_editor(df_default, num_rows="dynamic", key
