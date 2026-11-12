@@ -235,44 +235,4 @@ with tab3:
   st.header("📊 Método de Standing (Considerando Daño y Eficiencia de Flujo)")
   st.markdown(
       "Extensión de Vogel que incorpora la **Eficiencia de Flujo (EF / FE)**"
-      " para pozos dañados ($EF < 1$) o estimulados ($EF > 1$)."
-  )
-
-  col1, col2 = st.columns(2)
-  with col1:
-    p_R_std = st.number_input(
-        "Presión media del yacimiento, p_R (psia)",
-        value=3000.0,
-        key="p_R_std",
-    )
-    p_wf_std = st.number_input(
-        "Presión de fondo fluyendo de prueba, p_wf (psia)",
-        value=2000.0,
-        key="p_wf_std",
-    )
-    q_std = st.number_input(
-        "Gasto medido a p_wf, q_o (bpd)", value=800.0, key="q_std"
-    )
-  with col2:
-    ef = st.number_input(
-        "Eficiencia de Flujo, EF (o FE)",
-        value=0.6,
-        min_value=0.1,
-        max_value=3.0,
-        step=0.1,
-        key="ef3",
-    )
-    p_wf_min_std = st.number_input(
-        "Presión mínima para la curva, p_wf (psia)",
-        value=0.0,
-        key="p_wf_min_std",
-    )
-
-  if st.button("Calcular IPR - Standing", key="btn3"):
-    if p_wf_std >= p_R_std:
-      st.error(
-          "La presión de prueba ($p_{wf}$) debe ser menor que la presión del"
-          " yacimiento ($\bar{p}_R$)."
-      )
-    else:
-      term = 1.0 - (
+      " para pozos dañ
