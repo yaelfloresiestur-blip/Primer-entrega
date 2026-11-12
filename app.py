@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# Estilos CSS personalizados con fuentes aún más grandes
+# Estilos CSS personalizados con fuentes grandes
 st.markdown(
     """
     <style>
@@ -224,4 +224,139 @@ with tab3:
             " ecuación de Standing. Revise la EF y las presiones."
         )
       else:
-        q_omax_ef1 = q_std /
+        q_omax_ef1 = q_std / denom
+        if ef <= 1.0:
+          q_omax_ef = q_omax_ef1 * ((1.8 * ef) - (0.8 * (ef**2)))
+        else:
+          q_omax_ef = q_omax_ef1 * (0.624 + (0.376 * ef))
+
+        st.success(
+            f"**Potencial sin daño (q_omax, EF=1):** {q_omax_ef1:.2f} bpd"
+            f" | **Potencial con EF={ef}:** {q_omax_ef:.2f} bpd"
+        )
+
+        p_wf_vals = np.linspace(p_wf_min_std, p_R_std, 50)
+        terms = 1.0 - (p_wf_vals / p_R_std)
+        q_o_vals = q_omax_ef1 * (
+            (1.8 * ef * terms) - (0.8 * (ef**2) * (terms**2))
+        )
+        q_o_vals = np.maximum(q_o_vals, 0)
+
+        df_std = pd.DataFrame({
+            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
+            f"Gasto de Aceite, q_o (bpd) [EF={ef}]": q_o_vals,
+        })
+        st.subheader("Curva IPR - Método de Standing")
+        st.line_chart(df_std.set_index("Presión de Fondo Fluyente, p_wf (psia)"))
+        with st.expander("Ver tabla de datos detallada"):
+          st.dataframe(df_std)
+
+with tab4:
+  st.header("⚡ Método de Jones, Blount y Glaze (JBG - Turbulencia y Daño)")
+  st.markdown(
+      "Permite diferenciar las caídas de presión por flujo turbulento (no"
+      " darciano) y por daño a la formación mediante una prueba de"
+      " multi-gasto[cite: 102, 103, 104]."
+  )
+
+  p_R_jbg = st.number_input(
+      "Presión media del yacimiento, p_R (psia)", value=4500.0, key="pr4"
+  )
+  st.markdown(
+      "Ingrese los datos de la prueba de producción (multi-gasto /"
+      " flow-after-flow)[cite: 104]:"
+  )
+
+  df_default = pd.DataFrame({
+      "Gasto, q_o (bpd)": [550.0, 670.0, 750.0, 820.0],
+      "Presión p_wf (psia)": [4474.0, 4465.0, 4459.0, 4452.0],
+  })
+  edited_df = st.data_editor(df_default, num_rows="dynamic", key="editor4")
+
+  if st.button("Calcular JBG y Diagnóstico", key="btn4"):
+    if len(edited_df) < 2:
+      st.error(
+          "Se requieren al menos 2 puntos de prueba para aplicar el método"
+          " JBG."
+      )
+    else:
+      q_arr = edited_df["Gasto, q_o (bpd)"].values.astype(float)
+      pwf_arr = edited_df["Presión p_wf (psia)"].values.astype(float)
+
+      if np.any(q_arr <= 0):
+        st.error("Los gastos deben ser mayores a cero.")
+      else:
+        y_vals = (p_R_jbg - pwf_arr) / q_arr
+        a, b = np.polyfit(q_arr, y_vals, 1)
+
+        if a <= 0:
+          q_max = p_R_jbg / b if b > 0 else 0
+        else:
+          discriminant = (b**2) + (4 * a * p_R_jbg)
+          q_max = (-b + np.sqrt(discriminant)) / (2 * a)
+
+        b_prime = b + (a * q_max)
+        ratio_bb = b_prime / b if b != 0 else 0
+
+        st.success(
+            f"**Coeficiente de Turbulencia (a):** {a:.6f} (psi/bpd²)\n\n"
+            f"**Indicador de Daño (b):** {b:.4f} (psi/bpd)\n\n"
+            f"**Gasto Máximo / Potencial (q_max):** {q_max:.2f} bpd\n\n"
+            f"**Parámetro b':** {b_prime:.4f} | **Relación b'/b:**"
+            f" {ratio_bb:.2f}"
+        )
+
+        st.subheader("📋 Diagnóstico de la Terminación (Criterios JBG)")
+        diag_msg = []
+        if b <= 0.05:
+          diag_msg.append(
+              "✅ **Daño:** El pozo **no presenta daño** a la formación ($b"
+              " \\le 0.05$)[cite: 104]."
+          )
+        else:
+          diag_msg.append(
+              "⚠️ **Daño:** El pozo **presenta daño** a la formación ($b >"
+              " 0.05$)[cite: 104]."
+          )
+
+        if ratio_bb <= 2:
+          diag_msg.append(
+              "✅ **Turbulencia:** La turbulencia es baja o despreciable"
+              " ($b'/b \\le 2$)[cite: 104]."
+          )
+        else:
+          diag_msg.append(
+              "⚠️ **Turbulencia:** Existe un efecto importante de flujo"
+              " turbulento/no darciano ($b'/b > 2$)[cite: 104]."
+          )
+
+        if b <= 0.05 and ratio_bb <= 2:
+          diag_msg.append(
+              "🌟 **Recomendación:** La terminación del pozo es **muy buena**[cite: 104]."
+          )
+        elif b <= 0.05 and ratio_bb > 2:
+          diag_msg.append(
+              "💡 **Recomendación:** No se recomienda estimular. La baja"
+              " productividad se debe a área insuficiente del intervalo"
+              " disparado. Se sugiere **incrementar el área disparada**[cite: 104]."
+          )
+        elif b > 0.05 and ratio_bb <= 2:
+          diag_msg.append(
+              "💡 **Recomendación:** Se recomienda realizar un trabajo de"
+              " **estimulación**[cite: 104]."
+          )
+
+        for msg in diag_msg:
+          st.markdown(msg)
+
+        q_curve = np.linspace(0, q_max, 50)
+        pwf_curve = p_R_jbg - ((a * (q_curve**2)) + (b * q_curve))
+        pwf_curve = np.maximum(pwf_curve, 0)
+
+        df_jbg = pd.DataFrame(
+            {"Gasto de Aceite, q_o (bpd)": q_curve, "Presión p_wf (psia)": pwf_curve}
+        )
+        st.subheader("Curva IPR - Método JBG")
+        st.line_chart(df_jbg.set_index("Gasto de Aceite, q_o (bpd)"))
+        with st.expander("Ver tabla de datos detallada"):
+          st.dataframe(df_jbg)
