@@ -270,5 +270,8 @@ with tab3:
         )
         q_o_vals = np.maximum(q_o_vals, 0)
 
+        col_name = f"Gasto de Aceite, q_o (bpd) [EF={ef}]"
         df_std = pd.DataFrame({
-            f"Gasto de Aceite, q_o (bpd) [EF={ef}]": q_
+            col_name: q_o_vals,
+            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
+        })
