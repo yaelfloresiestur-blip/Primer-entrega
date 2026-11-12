@@ -145,10 +145,12 @@ with tab1:
               x=alt.X(
                   "Gasto de Aceite, qo (STB/d):Q",
                   title="Gasto de Aceite, qo (STB/d)",
+                  scale=alt.Scale(zero=False),
               ),
               y=alt.Y(
                   "Presion de Fondo Fluyente, pwf (psia):Q",
                   title="Presion de Fondo Fluyente, pwf (psia)",
+                  scale=alt.Scale(zero=False),
               ),
           )
           .properties(height=400)
@@ -218,10 +220,12 @@ with tab2:
               x=alt.X(
                   "Gasto de Aceite, qo (STB/d):Q",
                   title="Gasto de Aceite, qo (STB/d)",
+                  scale=alt.Scale(zero=False),
               ),
               y=alt.Y(
                   "Presion de Fondo Fluyente, pwf (psia):Q",
                   title="Presion de Fondo Fluyente, pwf (psia)",
+                  scale=alt.Scale(zero=False),
               ),
           )
           .properties(height=400)
@@ -312,10 +316,15 @@ with tab3:
             alt.Chart(df_std)
             .mark_line(color="#E76F51", strokeWidth=3)
             .encode(
-                x=alt.X(f"{col_name}:Q", title=col_name),
+                x=alt.X(
+                    f"{col_name}:Q",
+                    title=col_name,
+                    scale=alt.Scale(zero=False),
+                ),
                 y=alt.Y(
                     "Presion de Fondo Fluyente, pwf (psia):Q",
                     title="Presion de Fondo Fluyente, pwf (psia)",
+                    scale=alt.Scale(zero=False),
                 ),
             )
             .properties(height=400)
@@ -408,7 +417,7 @@ with tab4:
         elif b <= 0.05 and ratio_bb > 2:
           diag_msg.append(
               "💡 **Recomendacion:** No se recomienda estimular. La baja"
-              " productividad se debe a area insuficiente del intervalo"
+              " productividad se debe a área insuficiente del intervalo"
               " disparado. Se sugiere **incrementar el area disparada**."
           )
         elif b > 0.05 and ratio_bb <= 2:
@@ -438,10 +447,12 @@ with tab4:
                 x=alt.X(
                     "Gasto de Aceite, qo (bpd):Q",
                     title="Gasto de Aceite, qo (bpd)",
+                    scale=alt.Scale(zero=False),
                 ),
                 y=alt.Y(
                     "Presion pwf (psia):Q",
                     title="Presion de Fondo Fluyente, pwf (psia)",
+                    scale=alt.Scale(zero=False),
                 ),
             )
             .properties(height=400)
