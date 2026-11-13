@@ -133,8 +133,8 @@ with tab1:
       q_o_vals = J_star * (p_e - p_wf_vals)
 
       df_resultado = pd.DataFrame({
-          "Gasto de Aceite, q_o (STB/d)": q_o_vals,
-          "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
+          "Gasto": q_o_vals,
+          "Presión": p_wf_vals,
       })
 
       st.subheader("Curva IPR - Flujo Estacionario")
@@ -143,12 +143,14 @@ with tab1:
           .mark_line(color="#E63946", strokeWidth=3)
           .encode(
               x=alt.X(
-                  "Gasto de Aceite, q_o (STB/d):Q",
+                  "G:Q",
                   title="Gasto de Aceite, q_o (STB/d)",
+                  scale=alt.Scale(zero=False),
               ),
               y=alt.Y(
-                  "Presión de Fondo Fluyente, p_wf (psia):Q",
+                  "Presión:Q",
                   title="Presión de Fondo Fluyente, p_wf (psia)",
+                  scale=alt.Scale(zero=False),
               ),
           )
           .properties(height=400)
@@ -156,7 +158,11 @@ with tab1:
       st.altair_chart(chart, use_container_width=True)
 
       with st.expander("Ver tabla de datos detallada"):
-        st.dataframe(df_resultado)
+        df_show = pd.DataFrame({
+            "Gasto de Aceite, q_o (STB/d)": q_o_vals,
+            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
+        })
+        st.dataframe(df_show)
 
 with tab2:
   st.header("📉 Método de Vogel (Yacimientos de Aceite Saturado)")
@@ -206,8 +212,8 @@ with tab2:
       )
 
       df_vogel = pd.DataFrame({
-          "Gasto de Aceite, q_o (STB/d)": q_o_vals,
-          "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
+          "Gasto": q_o_vals,
+          "Presión": p_wf_vals,
       })
 
       st.subheader("Curva IPR - Método de Vogel")
@@ -216,12 +222,14 @@ with tab2:
           .mark_line(color="#2A9D8F", strokeWidth=3)
           .encode(
               x=alt.X(
-                  "Gasto de Aceite, q_o (STB/d):Q",
+                  "Gasto:Q",
                   title="Gasto de Aceite, q_o (STB/d)",
+                  scale=alt.Scale(zero=False),
               ),
               y=alt.Y(
-                  "Presión de Fondo Fluyente, p_wf (psia):Q",
+                  "Presión:Q",
                   title="Presión de Fondo Fluyente, p_wf (psia)",
+                  scale=alt.Scale(zero=False),
               ),
           )
           .properties(height=400)
@@ -229,7 +237,11 @@ with tab2:
       st.altair_chart(chart, use_container_width=True)
 
       with st.expander("Ver tabla de datos detallada"):
-        st.dataframe(df_vogel)
+        df_show = pd.DataFrame({
+            "Gasto de Aceite, q_o (STB/d)": q_o_vals,
+            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
+        })
+        st.dataframe(df_show)
 
 with tab3:
   st.header("📊 Método de Standing (Considerando Daño y Eficiencia de Flujo)")
@@ -301,10 +313,9 @@ with tab3:
         )
         q_o_vals = np.maximum(q_o_vals, 0)
 
-        col_name = f"Gasto de Aceite, q_o (bpd) [EF={ef}]"
         df_std = pd.DataFrame({
-            col_name: q_o_vals,
-            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
+            "Gasto": q_o_vals,
+            "Presión": p_wf_vals,
         })
 
         st.subheader("Curva IPR - Método de Standing")
@@ -312,10 +323,15 @@ with tab3:
             alt.Chart(df_std)
             .mark_line(color="#E76F51", strokeWidth=3)
             .encode(
-                x=alt.X(f"{col_name}:Q", title=col_name),
+                x=alt.X(
+                    "Gasto:Q",
+                    title=f"Gasto de Aceite, q_o (bpd) [EF={ef}]",
+                    scale=alt.Scale(zero=False),
+                ),
                 y=alt.Y(
-                    "Presión de Fondo Fluyente, p_wf (psia):Q",
+                    "Presión:Q",
                     title="Presión de Fondo Fluyente, p_wf (psia)",
+                    scale=alt.Scale(zero=False),
                 ),
             )
             .properties(height=400)
@@ -323,7 +339,11 @@ with tab3:
         st.altair_chart(chart, use_container_width=True)
 
         with st.expander("Ver tabla de datos detallada"):
-          st.dataframe(df_std)
+          df_show = pd.DataFrame({
+              f"Gasto de Aceite, q_o (bpd) [EF={ef}]": q_o_vals,
+              "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
+          })
+          st.dataframe(df_show)
 
 with tab4:
   st.header("⚡ Método de Jones, Blount y Glaze (JBG - Turbulencia y Daño)")
@@ -424,28 +444,36 @@ with tab4:
         pwf_curve = p_R_jbg - ((a * (q_curve**2)) + (b * q_curve))
         pwf_curve = np.maximum(pwf_curve, 0)
 
-        df_jbg = pd.DataFrame(
-            {
-                "Gasto de Aceite, q_o (bpd)": q_curve,
-                "Presión p_wf (psia)": pwf_curve,
-            }
-        )
+        df_jbg = pd.DataFrame({
+            "Gasto": q_curve,
+            "Presión": pwf_curve,
+        })
         st.subheader("Curva IPR - Método JBG")
         chart = (
             alt.Chart(df_jbg)
             .mark_line(color="#264653", strokeWidth=3)
             .encode(
                 x=alt.X(
-                    "Gasto de Aceite, q_o (bpd):Q",
+                    "Gasto:Q",
                     title="Gasto de Aceite, q_o (bpd)",
+                    scale=alt.Scale(zero=False),
                 ),
                 y=alt.Y(
-                    "Presión p_wf (psia):Q",
+                    "Presión:Q",
                     title="Presión de Fondo Fluyente, p_wf (psia)",
+                    scale=alt.Scale(zero=False),
                 ),
             )
             .properties(height=400)
         )
+        st.altair_chart(chart, use_container_width=True)
+
+        with st.expander("Ver tabla de datos detallada"):
+          df_show = pd.DataFrame({
+              "Gasto de Aceite, q_o (bpd)": q_curve,
+              "Presión p_wf (psia)": pwf_curve,
+          })
+          st.dataframe(df_show)
         st.altair_chart(chart, use_container_width=True)
 
         with st.expander("Ver tabla de datos detallada"):
