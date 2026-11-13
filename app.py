@@ -136,8 +136,8 @@ with tab1:
       y_col = "Presión de Fondo Fluyente, p_wf (psia)"
 
       df_resultado = pd.DataFrame({
-          x_col: q_o_vals,
-          y_col: p_wf_vals,
+          "Gasto": q_o_vals,
+          "Presión": p_wf_vals,
       })
 
       st.subheader("Curva IPR - Flujo Estacionario")
@@ -145,15 +145,19 @@ with tab1:
           alt.Chart(df_resultado)
           .mark_line(color="#E63946", strokeWidth=3)
           .encode(
-              x=alt.X(f"{x_col}:Q", title=x_col),
-              y=alt.Y(f"{y_col}:Q", title=y_col),
+              x=alt.X("G:Q", title=x_col),
+              y=alt.Y("Presión:Q", title=y_col),
           )
           .properties(height=400)
       )
       st.altair_chart(chart, use_container_width=True)
 
       with st.expander("Ver tabla de datos detallada"):
-        st.dataframe(df_resultado)
+        df_show = pd.DataFrame({
+            x_col: q_o_vals,
+            y_col: p_wf_vals,
+        })
+        st.dataframe(df_show)
 
 with tab2:
   st.header("📉 Método de Vogel (Yacimientos de Aceite Saturado)")
@@ -206,8 +210,8 @@ with tab2:
       y_col = "Presión de Fondo Fluyente, p_wf (psia)"
 
       df_vogel = pd.DataFrame({
-          x_col: q_o_vals,
-          y_col: p_wf_vals,
+          "Gasto": q_o_vals,
+          "Presión": p_wf_vals,
       })
 
       st.subheader("Curva IPR - Método de Vogel")
@@ -215,15 +219,19 @@ with tab2:
           alt.Chart(df_vogel)
           .mark_line(color="#2A9D8F", strokeWidth=3)
           .encode(
-              x=alt.X(f"{x_col}:Q", title=x_col),
-              y=alt.Y(f"{y_col}:Q", title=y_col),
+              x=alt.X("G:Q", title=x_col),
+              y=alt.Y("Presión:Q", title=y_col),
           )
           .properties(height=400)
       )
       st.altair_chart(chart, use_container_width=True)
 
       with st.expander("Ver tabla de datos detallada"):
-        st.dataframe(df_vogel)
+        df_show = pd.DataFrame({
+            x_col: q_o_vals,
+            y_col: p_wf_vals,
+        })
+        st.dataframe(df_show)
 
 with tab3:
   st.header("📊 Método de Standing (Considerando Daño y Eficiencia de Flujo)")
@@ -295,12 +303,12 @@ with tab3:
         )
         q_o_vals = np.maximum(q_o_vals, 0)
 
-        x_col = f"Gasto de Aceite, q_o (bpd) [EF={ef}]"
-        y_col = "Presión de Fondo Fluyente, p_wf (psia)"
+        x_title = f"Gasto de Aceite, q_o (bpd) [EF={ef}]"
+        y_title = "Presión de Fondo Fluyente, p_wf (psia)"
 
         df_std = pd.DataFrame({
-            x_col: q_o_vals,
-            y_col: p_wf_vals,
+            "Gasto": q_o_vals,
+            "Presión": p_wf_vals,
         })
 
         st.subheader("Curva IPR - Método de Standing")
@@ -308,15 +316,19 @@ with tab3:
             alt.Chart(df_std)
             .mark_line(color="#E76F51", strokeWidth=3)
             .encode(
-                x=alt.X(f"{x_col}:Q", title=x_col),
-                y=alt.Y(f"{y_col}:Q", title=y_col),
+                x=alt.X("Gasto:Q", title=x_title),
+                y=alt.Y("Presión:Q", title=y_title),
             )
             .properties(height=400)
         )
         st.altair_chart(chart, use_container_width=True)
 
         with st.expander("Ver tabla de datos detallada"):
-          st.dataframe(df_std)
+          df_show = pd.DataFrame({
+              x_title: q_o_vals,
+              y_title: p_wf_vals,
+          })
+          st.dataframe(df_show)
 
 with tab4:
   st.header("⚡ Método de Jones, Blount y Glaze (JBG - Turbulencia y Daño)")
@@ -421,19 +433,27 @@ with tab4:
         y_col = "Presión p_wf (psia)"
 
         df_jbg = pd.DataFrame({
-            x_col: q_curve,
-            y_col: pwf_curve,
+            "Gasto": q_curve,
+            "Presión": pwf_curve,
         })
         st.subheader("Curva IPR - Método JBG")
         chart = (
             alt.Chart(df_jbg)
             .mark_line(color="#264653", strokeWidth=3)
             .encode(
-                x=alt.X(f"{x_col}:Q", title=x_col),
-                y=alt.Y(f"{y_col}:Q", title=y_col),
+                x=alt.X("Gasto:Q", title=x_col),
+                y=alt.Y("Presión:Q", title=y_col),
             )
             .properties(height=400)
         )
+        st.altair_chart(chart, use_container_width=True)
+
+        with st.expander("Ver tabla de datos detallada"):
+          df_show = pd.DataFrame({
+              x_col: q_curve,
+              y_col: pwf_curve,
+          })
+          st.dataframe(df_show)
         st.altair_chart(chart, use_container_width=True)
 
         with st.expander("Ver tabla de datos detallada"):
