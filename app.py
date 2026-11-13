@@ -449,7 +449,4 @@ with tab4:
         st.altair_chart(chart, use_container_width=True)
 
         with st.expander("Ver tabla de datos detallada"):
-          st.dataframe(df_jbg)ner_width=True)
-
-        with st.expander("Ver tabla de datos detallada"):
           st.dataframe(df_jbg)
