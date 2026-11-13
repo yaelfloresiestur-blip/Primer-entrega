@@ -132,8 +132,8 @@ with tab1:
       p_wf_vals = np.linspace(p_wf_min, p_e, 50)
       q_o_vals = J_star * (p_e - p_wf_vals)
 
-      x_col = "Gasto de Aceite, q_o (STB/d)"
-      y_col = "Presión de Fondo Fluyente, p_wf (psia)"
+      x_title = "Gasto de Aceite, q_o (STB/d)"
+      y_title = "Presión de Fondo Fluyente, p_wf (psia)"
 
       df_resultado = pd.DataFrame({
           "Gasto": q_o_vals,
@@ -145,8 +145,8 @@ with tab1:
           alt.Chart(df_resultado)
           .mark_line(color="#E63946", strokeWidth=3)
           .encode(
-              x=alt.X("G:Q", title=x_col),
-              y=alt.Y("Presión:Q", title=y_col),
+              x=alt.X("Gasto:Q", title=x_title),
+              y=alt.Y("Presión:Q", title=y_title),
           )
           .properties(height=400)
       )
@@ -154,8 +154,8 @@ with tab1:
 
       with st.expander("Ver tabla de datos detallada"):
         df_show = pd.DataFrame({
-            x_col: q_o_vals,
-            y_col: p_wf_vals,
+            x_title: q_o_vals,
+            y_title: p_wf_vals,
         })
         st.dataframe(df_show)
 
@@ -206,8 +206,8 @@ with tab2:
           1.0 - (0.2 * rel_p_vals) - (0.8 * (rel_p_vals**2))
       )
 
-      x_col = "Gasto de Aceite, q_o (STB/d)"
-      y_col = "Presión de Fondo Fluyente, p_wf (psia)"
+      x_title = "Gasto de Aceite, q_o (STB/d)"
+      y_title = "Presión de Fondo Fluyente, p_wf (psia)"
 
       df_vogel = pd.DataFrame({
           "Gasto": q_o_vals,
@@ -219,8 +219,8 @@ with tab2:
           alt.Chart(df_vogel)
           .mark_line(color="#2A9D8F", strokeWidth=3)
           .encode(
-              x=alt.X("G:Q", title=x_col),
-              y=alt.Y("Presión:Q", title=y_col),
+              x=alt.X("Gasto:Q", title=x_title),
+              y=alt.Y("Presión:Q", title=y_title),
           )
           .properties(height=400)
       )
@@ -228,8 +228,8 @@ with tab2:
 
       with st.expander("Ver tabla de datos detallada"):
         df_show = pd.DataFrame({
-            x_col: q_o_vals,
-            y_col: p_wf_vals,
+            x_title: q_o_vals,
+            y_title: p_wf_vals,
         })
         st.dataframe(df_show)
 
@@ -429,8 +429,8 @@ with tab4:
         pwf_curve = p_R_jbg - ((a * (q_curve**2)) + (b * q_curve))
         pwf_curve = np.maximum(pwf_curve, 0)
 
-        x_col = "Gasto de Aceite, q_o (bpd)"
-        y_col = "Presión p_wf (psia)"
+        x_title = "Gasto de Aceite, q_o (bpd)"
+        y_title = "Presión p_wf (psia)"
 
         df_jbg = pd.DataFrame({
             "Gasto": q_curve,
@@ -441,8 +441,8 @@ with tab4:
             alt.Chart(df_jbg)
             .mark_line(color="#264653", strokeWidth=3)
             .encode(
-                x=alt.X("Gasto:Q", title=x_col),
-                y=alt.Y("Presión:Q", title=y_col),
+                x=alt.X("Gasto:Q", title=x_title),
+                y=alt.Y("Presión:Q", title=y_title),
             )
             .properties(height=400)
         )
@@ -450,11 +450,7 @@ with tab4:
 
         with st.expander("Ver tabla de datos detallada"):
           df_show = pd.DataFrame({
-              x_col: q_curve,
-              y_col: pwf_curve,
+              x_title: q_curve,
+              y_title: pwf_curve,
           })
           st.dataframe(df_show)
-        st.altair_chart(chart, use_container_width=True)
-
-        with st.expander("Ver tabla de datos detallada"):
-          st.dataframe(df_jbg)
