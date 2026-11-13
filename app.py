@@ -142,16 +142,8 @@ with tab1:
           alt.Chart(df_resultado)
           .mark_line(color="#E63946", strokeWidth=3)
           .encode(
-              x=alt.X(
-                  "G:Q",
-                  title="Gasto de Aceite, q_o (STB/d)",
-                  scale=alt.Scale(zero=False),
-              ),
-              y=alt.Y(
-                  "Presión:Q",
-                  title="Presión de Fondo Fluyente, p_wf (psia)",
-                  scale=alt.Scale(zero=False),
-              ),
+              x=alt.X("G:Q", title="Gasto de Aceite, q_o (STB/d)"),
+              y=alt.Y("Presión:Q", title="Presión de Fondo Fluyente, p_wf (psia)"),
           )
           .properties(height=400)
       )
@@ -221,16 +213,8 @@ with tab2:
           alt.Chart(df_vogel)
           .mark_line(color="#2A9D8F", strokeWidth=3)
           .encode(
-              x=alt.X(
-                  "Gasto:Q",
-                  title="Gasto de Aceite, q_o (STB/d)",
-                  scale=alt.Scale(zero=False),
-              ),
-              y=alt.Y(
-                  "Presión:Q",
-                  title="Presión de Fondo Fluyente, p_wf (psia)",
-                  scale=alt.Scale(zero=False),
-              ),
+              x=alt.X("G:Q", title="Gasto de Aceite, q_o (STB/d)"),
+              y=alt.Y("Presión:Q", title="Presión de Fondo Fluyente, p_wf (psia)"),
           )
           .properties(height=400)
       )
@@ -323,15 +307,10 @@ with tab3:
             alt.Chart(df_std)
             .mark_line(color="#E76F51", strokeWidth=3)
             .encode(
-                x=alt.X(
-                    "Gasto:Q",
-                    title=f"Gasto de Aceite, q_o (bpd) [EF={ef}]",
-                    scale=alt.Scale(zero=False),
-                ),
+                x=alt.X("G:Q", title=f"Gasto de Aceite, q_o (bpd) [EF={ef}]"),
                 y=alt.Y(
                     "Presión:Q",
                     title="Presión de Fondo Fluyente, p_wf (psia)",
-                    scale=alt.Scale(zero=False),
                 ),
             )
             .properties(height=400)
@@ -453,15 +432,10 @@ with tab4:
             alt.Chart(df_jbg)
             .mark_line(color="#264653", strokeWidth=3)
             .encode(
-                x=alt.X(
-                    "Gasto:Q",
-                    title="Gasto de Aceite, q_o (bpd)",
-                    scale=alt.Scale(zero=False),
-                ),
+                x=alt.X("G:Q", title="Gasto de Aceite, q_o (bpd)"),
                 y=alt.Y(
                     "Presión:Q",
                     title="Presión de Fondo Fluyente, p_wf (psia)",
-                    scale=alt.Scale(zero=False),
                 ),
             )
             .properties(height=400)
@@ -474,7 +448,3 @@ with tab4:
               "Presión p_wf (psia)": pwf_curve,
           })
           st.dataframe(df_show)
-        st.altair_chart(chart, use_container_width=True)
-
-        with st.expander("Ver tabla de datos detallada"):
-          st.dataframe(df_jbg)
