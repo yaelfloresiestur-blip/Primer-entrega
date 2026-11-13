@@ -132,9 +132,12 @@ with tab1:
       p_wf_vals = np.linspace(p_wf_min, p_e, 50)
       q_o_vals = J_star * (p_e - p_wf_vals)
 
+      x_col = "Gasto de Aceite, q_o (STB/d)"
+      y_col = "Presión de Fondo Fluyente, p_wf (psia)"
+
       df_resultado = pd.DataFrame({
-          "Gasto": q_o_vals,
-          "Presión": p_wf_vals,
+          x_col: q_o_vals,
+          y_col: p_wf_vals,
       })
 
       st.subheader("Curva IPR - Flujo Estacionario")
@@ -142,19 +145,15 @@ with tab1:
           alt.Chart(df_resultado)
           .mark_line(color="#E63946", strokeWidth=3)
           .encode(
-              x=alt.X("G:Q", title="Gasto de Aceite, q_o (STB/d)"),
-              y=alt.Y("Presión:Q", title="Presión de Fondo Fluyente, p_wf (psia)"),
+              x=alt.X(f"{x_col}:Q", title=x_col),
+              y=alt.Y(f"{y_col}:Q", title=y_col),
           )
           .properties(height=400)
       )
       st.altair_chart(chart, use_container_width=True)
 
       with st.expander("Ver tabla de datos detallada"):
-        df_show = pd.DataFrame({
-            "Gasto de Aceite, q_o (STB/d)": q_o_vals,
-            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
-        })
-        st.dataframe(df_show)
+        st.dataframe(df_resultado)
 
 with tab2:
   st.header("📉 Método de Vogel (Yacimientos de Aceite Saturado)")
@@ -203,9 +202,12 @@ with tab2:
           1.0 - (0.2 * rel_p_vals) - (0.8 * (rel_p_vals**2))
       )
 
+      x_col = "Gasto de Aceite, q_o (STB/d)"
+      y_col = "Presión de Fondo Fluyente, p_wf (psia)"
+
       df_vogel = pd.DataFrame({
-          "Gasto": q_o_vals,
-          "Presión": p_wf_vals,
+          x_col: q_o_vals,
+          y_col: p_wf_vals,
       })
 
       st.subheader("Curva IPR - Método de Vogel")
@@ -213,19 +215,15 @@ with tab2:
           alt.Chart(df_vogel)
           .mark_line(color="#2A9D8F", strokeWidth=3)
           .encode(
-              x=alt.X("G:Q", title="Gasto de Aceite, q_o (STB/d)"),
-              y=alt.Y("Presión:Q", title="Presión de Fondo Fluyente, p_wf (psia)"),
+              x=alt.X(f"{x_col}:Q", title=x_col),
+              y=alt.Y(f"{y_col}:Q", title=y_col),
           )
           .properties(height=400)
       )
       st.altair_chart(chart, use_container_width=True)
 
       with st.expander("Ver tabla de datos detallada"):
-        df_show = pd.DataFrame({
-            "Gasto de Aceite, q_o (STB/d)": q_o_vals,
-            "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
-        })
-        st.dataframe(df_show)
+        st.dataframe(df_vogel)
 
 with tab3:
   st.header("📊 Método de Standing (Considerando Daño y Eficiencia de Flujo)")
@@ -297,9 +295,12 @@ with tab3:
         )
         q_o_vals = np.maximum(q_o_vals, 0)
 
+        x_col = f"Gasto de Aceite, q_o (bpd) [EF={ef}]"
+        y_col = "Presión de Fondo Fluyente, p_wf (psia)"
+
         df_std = pd.DataFrame({
-            "Gasto": q_o_vals,
-            "Presión": p_wf_vals,
+            x_col: q_o_vals,
+            y_col: p_wf_vals,
         })
 
         st.subheader("Curva IPR - Método de Standing")
@@ -307,22 +308,15 @@ with tab3:
             alt.Chart(df_std)
             .mark_line(color="#E76F51", strokeWidth=3)
             .encode(
-                x=alt.X("G:Q", title=f"Gasto de Aceite, q_o (bpd) [EF={ef}]"),
-                y=alt.Y(
-                    "Presión:Q",
-                    title="Presión de Fondo Fluyente, p_wf (psia)",
-                ),
+                x=alt.X(f"{x_col}:Q", title=x_col),
+                y=alt.Y(f"{y_col}:Q", title=y_col),
             )
             .properties(height=400)
         )
         st.altair_chart(chart, use_container_width=True)
 
         with st.expander("Ver tabla de datos detallada"):
-          df_show = pd.DataFrame({
-              f"Gasto de Aceite, q_o (bpd) [EF={ef}]": q_o_vals,
-              "Presión de Fondo Fluyente, p_wf (psia)": p_wf_vals,
-          })
-          st.dataframe(df_show)
+          st.dataframe(df_std)
 
 with tab4:
   st.header("⚡ Método de Jones, Blount y Glaze (JBG - Turbulencia y Daño)")
@@ -352,4 +346,95 @@ with tab4:
           " JBG."
       )
     else:
-      q_arr
+      q_arr = edited_df["Gasto, q_o (bpd)"].values.astype(float)
+      pwf_arr = edited_df["Presión p_wf (psia)"].values.astype(float)
+
+      if np.any(q_arr <= 0):
+        st.error("Los gastos deben ser mayores a cero.")
+      else:
+        y_vals = (p_R_jbg - pwf_arr) / q_arr
+        a, b = np.polyfit(q_arr, y_vals, 1)
+
+        if a <= 0:
+          q_max = p_R_jbg / b if b > 0 else 0
+        else:
+          discriminant = (b**2) + (4 * a * p_R_jbg)
+          q_max = (-b + np.sqrt(discriminant)) / (2 * a)
+
+        b_prime = b + (a * q_max)
+        ratio_bb = b_prime / b if b != 0 else 0
+
+        st.success(
+            f"**Coeficiente de Turbulencia (a):** {a:.6f} (psi/bpd²)\n\n"
+            f"**Indicador de Daño (b):** {b:.4f} (psi/bpd)\n\n"
+            f"**Gasto Máximo / Potencial (q_max):** {q_max:.2f} bpd\n\n"
+            f"**Parámetro b':** {b_prime:.4f} | **Relación b'/b:**"
+            f" {ratio_bb:.2f}"
+        )
+
+        st.subheader("📋 Diagnóstico de la Terminación (Criterios JBG)")
+        diag_msg = []
+        if b <= 0.05:
+          diag_msg.append(
+              "✅ **Daño:** El pozo **no presenta daño** a la formación ($b \\le 0.05$)."
+          )
+        else:
+          diag_msg.append(
+              "⚠️ **Daño:** El pozo **presenta daño** a la formación ($b > 0.05$)."
+          )
+
+        if ratio_bb <= 2:
+          diag_msg.append(
+              "✅ **Turbulencia:** La turbulencia es baja o despreciable"
+              " ($b'/b \\le 2$)."
+          )
+        else:
+          diag_msg.append(
+              "⚠️ **Turbulencia:** Existe un efecto importante de flujo"
+              " turbulento/no darciano ($b'/b > 2$)."
+          )
+
+        if b <= 0.05 and ratio_bb <= 2:
+          diag_msg.append(
+              "🌟 **Recomendación:** La terminación del pozo es **muy buena**."
+          )
+        elif b <= 0.05 and ratio_bb > 2:
+          diag_msg.append(
+              "💡 **Recomendación:** No se recomienda estimular. La baja"
+              " productividad se debe a área insuficiente del intervalo"
+              " disparado. Se sugiere **incrementar el área disparada**."
+          )
+        elif b > 0.05 and ratio_bb <= 2:
+          diag_msg.append(
+              "💡 **Recomendación:** Se recomienda realizar un trabajo de"
+              " **estimulación**."
+          )
+
+        for msg in diag_msg:
+          st.markdown(msg)
+
+        q_curve = np.linspace(0, q_max, 50)
+        pwf_curve = p_R_jbg - ((a * (q_curve**2)) + (b * q_curve))
+        pwf_curve = np.maximum(pwf_curve, 0)
+
+        x_col = "Gasto de Aceite, q_o (bpd)"
+        y_col = "Presión p_wf (psia)"
+
+        df_jbg = pd.DataFrame({
+            x_col: q_curve,
+            y_col: pwf_curve,
+        })
+        st.subheader("Curva IPR - Método JBG")
+        chart = (
+            alt.Chart(df_jbg)
+            .mark_line(color="#264653", strokeWidth=3)
+            .encode(
+                x=alt.X(f"{x_col}:Q", title=x_col),
+                y=alt.Y(f"{y_col}:Q", title=y_col),
+            )
+            .properties(height=400)
+        )
+        st.altair_chart(chart, use_container_width=True)
+
+        with st.expander("Ver tabla de datos detallada"):
+          st.dataframe(df_jbg)
